@@ -1,2 +1,22 @@
 <h1>Welcome to the Tech Blog</h1>
-<p>Latest posts:</p>
+
+<div class="container">
+    {{#if logged_in}}
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+    {{else}}
+        <a href="/login">Login</a>
+        <a href="/signup">Signup</a>
+    {{/if}}
+
+    <p>Latest posts:</p>
+    
+    <div class="posts">
+        {{#each posts}}
+        <div class="post">
+            <h3>{{this.title}}</h3>
+            <p>{{this.content}}</p>
+        </div>
+        {{/each}}
+    </div>
+</div>
