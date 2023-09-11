@@ -1,8 +1,24 @@
 {{!-- Display Single Post Details --}}
 
 <h1>{{post.title}}</h1>
-<p>Written by: {{post.username}}</p> {{!-- Assuming each post is associated with a user --}}
+<p>Written by: {{post.username}}</p>
 <p>{{post.content}}</p>
+
+<h4>Comments:</h4>
+<ul class="comments">
+    {{#each post.comments}}
+        <li>{{this.content}} - by {{this.user.username}}</li>
+    {{/each}}
+</ul>
+
+{{!-- Comment Form for users to add a new comment --}}
+{{#if logged_in}}
+<form action="/api/comments" method="POST">
+    <textarea name="content" placeholder="Write your comment here..." required></textarea>
+    <input type="hidden" name="post_id" value="{{post.id}}">
+    <button type="submit" class="btn btn-submit">Submit Comment</button>
+</form>
+{{/if}}
 
 {{!-- If the user viewing this is the author then show Edit & Delete options --}}
 {{#if isAuthor}}

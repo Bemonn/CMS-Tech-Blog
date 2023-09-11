@@ -1,6 +1,7 @@
 const express = require('express');
 const User = require('../models/User');
 const Post = require('../models/Post');
+const Comment = require('../models/Comment');
 const router = express.Router();
 
 // The function to ensure users are authenticated
@@ -49,9 +50,10 @@ router.post('/login', async (req, res) => {
     if (user.checkPassword(req.body.password)) {
         // Set up session data
         req.session.user = {
-            id: user.user_id,
+            id: user.id,
             username: user.username
         };
+        req.session.logged_in = true;
         res.redirect('/'); // Redirecting to homepage after successful login
     } else {
         res.status(401).json({ message: 'Incorrect password' });
@@ -67,10 +69,37 @@ router.post('/signup', async (req, res) => {
     try {
         const newUser = await User.create(req.body);
         req.session.user = {
-            id: newUser.user_id,
+            id: newUser.id,
             username: newUser.username
         };
+        req.session.logged_in = true;
         res.redirect('/'); // Redirecting to homepage after successful signup
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+router.get('/post/:id', async (req, res) => {
+    try {
+        const postData = await Post.findByPk(req.params.id, {
+            include: [
+                { model: User },
+                { model: Comment, include: [User] }
+            ]
+        });
+
+        if (!postData) {
+            res.status(404).json({ message: 'No post found with this ID' });
+            return;
+        }
+
+        const post = postData.get({ plain: true });
+
+        res.render('post', {
+            ...post,
+            logged_in: req.session.logged_in, 
+            isAuthor: req.session.user_id === post.userId
+        });
     } catch (err) {
         res.status(500).json(err);
     }
@@ -110,7 +139,12 @@ router.post('/dashboard/new', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// GET route to display edit form
+router.get('/dashboard/new', ensureAuthenticated, (req, res) => {
+    res.render('new-post', {
+        logged_in: req.session.logged_in
+    });
+});
+
 router.get('/dashboard/edit/:id', ensureAuthenticated, async (req, res) => {
     try {
         const post = await Post.findByPk(req.params.id);
@@ -129,8 +163,7 @@ router.get('/dashboard/edit/:id', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// PUT route to update post
-router.put('/dashboard/edit/:id', ensureAuthenticated, async (req, res) => {
+router.post('/dashboard/edit/:id', ensureAuthenticated, async (req, res) => {
     try {
         const updatedPost = await Post.update(req.body, {
             where: {
@@ -139,8 +172,8 @@ router.put('/dashboard/edit/:id', ensureAuthenticated, async (req, res) => {
             }
         });
 
-        if (updatedPost) {
-            res.json({ message: 'Post updated successfully!' });
+        if (updatedPost[0] > 0) { // Check if any rows were updated
+            res.redirect('/dashboard');
         } else {
             res.status(404).json({ message: 'Post not found!' });
         }
