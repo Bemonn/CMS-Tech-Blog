@@ -16,7 +16,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     try {
         const userPosts = await Post.findAll({
             where: {
-                userId: req.session.user.id
+                user_id: req.session.user.id
             }
         });
 
@@ -42,7 +42,7 @@ router.post('/new', ensureAuthenticated, async (req, res) => {
     try {
         const newPost = await Post.create({
             ...req.body,
-            userId: req.session.user.id
+            user_id: req.session.user.id
         });
 
         res.redirect('/dashboard');
@@ -77,7 +77,7 @@ router.put('/edit/:id', ensureAuthenticated, async (req, res) => {
         const updatedPost = await Post.update(req.body, {
             where: {
                 id: req.params.id,
-                userId: req.session.user.id
+                user_id: req.session.user.id
             }
         });
 
@@ -98,7 +98,7 @@ router.delete('/:id', ensureAuthenticated, async (req, res) => {
         const post = await Post.destroy({
             where: {
                 id: req.params.id,
-                userId: req.session.user.id  // Ensure only the post owner can delete
+                user_id: req.session.user.id  // Ensure only the post owner can delete
             }
         });
 
