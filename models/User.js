@@ -1,7 +1,14 @@
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../config/connection');
 const bcrypt = require('bcrypt');
 
-module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+class User extends Model {
+  async validPassword(password) {
+    return await bcrypt.compare(password, this.password);
+  }
+}
+
+User.init({
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -20,32 +27,19 @@ module.exports = (sequelize, DataTypes) => {
         len: [8],
       },
     },
-  });
+}, {
+    hooks: {
+        beforeCreate: async (user) => {
+            user.password = await bcrypt.hash(user.password, 10);
+        },
+        beforeUpdate: async (user) => {
+            if (user.changed('password')) {
+                user.password = await bcrypt.hash(user.password, 10);
+            }
+        }
+    },
+    sequelize,
+    modelName: 'user'
+});
 
-  User.associate = (models) => {
-    User.hasMany(models.Post, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE',
-    });
-    User.hasMany(models.Comment, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE',
-    });
-  };
-
-  User.addHook('beforeCreate', async (user) => {
-    user.password = await bcrypt.hash(user.password, 10);
-  });
-
-  User.addHook('beforeUpdate', async (user) => {
-    if (user.changed('password')) {
-      user.password = await bcrypt.hash(user.password, 10);
-    }
-  });
-
-  User.prototype.validPassword = async function(password) {
-    return await bcrypt.compare(password, this.password);
-  };
-
-  return User;
-};
+module.exports = User;
