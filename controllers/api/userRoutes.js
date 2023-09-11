@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
     // Return the homepage with all the posts
-    res.render('homepage');
+    res.render('home');
 });
 
 router.get('/login', (req, res) => {

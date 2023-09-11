@@ -2,11 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const exphbs = require("express-handlebars"); 
-if (typeof exphbs === 'function') {
-    console.log("exphbs is recognized as a function");
-} else {
-    console.log("exphbs is NOT recognized as a function");
-}
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 const routes = require('./controllers');
