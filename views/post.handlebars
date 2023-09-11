@@ -1,2 +1,11 @@
-<h1>{{ post.title }}</h1>
-<p>{{ post.content }}</p>
+{{!-- Display Single Post Details --}}
+
+<h1>{{post.title}}</h1>
+<p>Written by: {{post.username}}</p> {{!-- Assuming each post is associated with a user --}}
+<p>{{post.content}}</p>
+
+{{!-- If the user viewing this is the author then show Edit & Delete options --}}
+{{#if isAuthor}}
+<a href="/dashboard/edit/{{post.id}}" class="btn btn-edit">Edit</a>
+<button data-post-id="{{post.id}}" class="btn btn-delete">Delete</button>
+{{/if}}

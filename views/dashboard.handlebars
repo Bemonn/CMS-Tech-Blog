@@ -1,2 +1,21 @@
-<h1>Your Dashboard</h1>
-<p>Here you can manage your posts and view statistics.</p>
+{{!-- Dashboard --}}
+
+<h1>Welcome to Your Dashboard</h1>
+
+{{!-- Create New Post Button --}}
+<a href="/dashboard/new" class="btn btn-primary">Create New Post</a>
+
+{{!-- Display all user's posts --}}
+{{#each posts as |post|}}
+<div class="post">
+    <h2>{{post.title}}</h2>
+    <p>{{post.content}}</p>
+
+    {{!-- Edit & Delete Buttons for each post --}}
+    <a href="/dashboard/edit/{{post.id}}" class="btn btn-edit">Edit</a>
+    <button data-post-id="{{post.id}}" class="btn btn-delete">Delete</button>
+</div>
+{{/each}}
+
+
+<script src="/js/dashboard.js"></script>
