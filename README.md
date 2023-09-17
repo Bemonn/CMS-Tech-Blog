@@ -16,7 +16,7 @@ The site has a big emphasis on security and requires login for users to be able 
 
 ## Installation
 
-NPM install to use locally or use link for deployed site
+```NPM install to use locally or use link for deployed site```
 
 ### Deployed Link
 
